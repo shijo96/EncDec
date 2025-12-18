@@ -1,0 +1,812 @@
+{% include "lawyer_header.html" %}
+
+<style>
+body {
+    background: #0d0d0d;
+    color: #e6e6e6;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.page-header {
+    text-align: center;
+    margin: 80px 0 30px;
+    padding-bottom: 20px;
+}
+
+.page-header h2 {
+    color: #00eaff;
+    font-size: 32px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+}
+
+.page-subtitle {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+}
+
+/* Search and Filter Section */
+.search-filter-container {
+    max-width: 1600px;
+    margin: 0 auto 30px;
+    padding: 0 40px;
+}
+
+.search-filter-wrapper {
+    background: linear-gradient(145deg, #1a1a1a, #151515);
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.search-box {
+    flex: 1;
+    min-width: 250px;
+    position: relative;
+}
+
+.search-input {
+    width: 100%;
+    background: #0f0f0f;
+    border: 1px solid #333;
+    color: #eee;
+    padding: 12px 16px 12px 45px;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #00eaff;
+    box-shadow: 0 0 0 3px rgba(0, 234, 255, 0.1);
+}
+
+.search-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 16px;
+}
+
+.filter-group {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.filter-label {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.filter-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid #333;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #0f0f0f;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.filter-btn:hover {
+    border-color: #00eaff;
+    color: #00eaff;
+}
+
+.filter-btn.active {
+    background: linear-gradient(135deg, #0099cc, #00bfff);
+    border-color: #00bfff;
+    color: #fff;
+}
+
+.filter-btn.active-status {
+    background: linear-gradient(135deg, #009966, #00cc88);
+    border-color: #00cc88;
+    color: #fff;
+}
+
+.filter-btn.deceased-status {
+    background: linear-gradient(135deg, #b02a37, #dc3545);
+    border-color: #dc3545;
+    color: #fff;
+}
+
+.results-count {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+    margin-left: auto;
+    white-space: nowrap;
+}
+
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 24px;
+    padding: 20px 40px 120px;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.testator-card {
+    background: linear-gradient(145deg, #1a1a1a, #151515);
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.testator-card.hidden {
+    display: none;
+}
+
+.testator-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #00eaff, #0099cc);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.testator-card:hover::before {
+    opacity: 1;
+}
+
+.testator-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 234, 255, 0.15);
+    border-color: #00eaff33;
+}
+
+.card-title {
+    font-weight: 700;
+    font-size: 20px;
+    color: #00eaff;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #2a2a2a;
+}
+
+.card-field {
+    margin: 12px 0;
+    font-size: 14px;
+    color: #ccc;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.card-field label {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    min-width: 140px;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+
+.card-field-value {
+    color: #fff;
+    flex: 1;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.status-active {
+    background-color: rgba(0, 153, 102, 0.2);
+    color: #00cc88;
+}
+
+.status-deceased {
+    background-color: rgba(255, 68, 68, 0.2);
+    color: #ff4444;
+}
+
+.key-section {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #2a2a2a;
+}
+
+.key-box {
+    background: #0f0f0f;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 10px;
+    border: 1px solid #2a2a2a;
+    display: none;
+}
+
+.key-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.key-value {
+    background: #262626;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #00ffaa;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    word-break: break-all;
+    flex: 1;
+    border: 1px solid #333;
+}
+
+.decrypt-section {
+    margin-top: 12px;
+}
+
+.decrypt-form {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.form-select,
+.form-control {
+    background: #0f0f0f;
+    border: 1px solid #333;
+    color: #eee;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+.form-select:focus,
+.form-control:focus {
+    outline: none;
+    border-color: #00eaff;
+    box-shadow: 0 0 0 2px rgba(0, 234, 255, 0.1);
+}
+
+.form-select-sm {
+    padding: 6px 10px;
+    font-size: 13px;
+}
+
+.form-control-sm {
+    padding: 6px 10px;
+    font-size: 13px;
+    flex: 1;
+}
+
+/* Buttons */
+.btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #0099cc, #00bfff);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #00bfff, #00d4ff);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 153, 204, 0.3);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #009966, #00cc88);
+    color: #fff;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #00cc88, #00e699);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 153, 102, 0.3);
+}
+
+.btn-light {
+    background: #262626;
+    color: #fff;
+    border: 1px solid #333;
+}
+
+.btn-light:hover {
+    background: #333;
+}
+
+.btn-secondary {
+    background: #444;
+    color: #fff;
+}
+
+.btn-secondary:hover {
+    background: #555;
+}
+
+.link-view {
+    color: #00eaff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.link-view:hover {
+    color: #00ffff;
+    text-decoration: underline;
+}
+
+/* Modal */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(4px);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    background: #fff;
+    width: 90%;
+    max-width: 480px;
+    padding: 32px;
+    margin: 100px auto;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-content h4 {
+    color: #1a1a1a;
+    margin-bottom: 24px;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.modal-content form {
+    color: #1a1a1a;
+}
+
+.modal-content label {
+    display: block;
+    margin-top: 16px;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+}
+
+.modal-content .form-control {
+    width: 100%;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    color: #1a1a1a;
+    padding: 10px 12px;
+}
+
+.modal-content .form-control:focus {
+    background: #fff;
+    border-color: #0099cc;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.modal-actions .btn {
+    flex: 1;
+    padding: 10px 20px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.empty-state-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .search-filter-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-group {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .filter-buttons {
+        justify-content: center;
+    }
+
+    .results-count {
+        margin-left: 0;
+        text-align: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .cards-container {
+        grid-template-columns: 1fr;
+        padding: 20px;
+    }
+
+    .search-filter-container {
+        padding: 0 20px;
+    }
+
+    .page-header {
+        margin: 40px 0 30px;
+    }
+
+    .page-header h2 {
+        font-size: 24px;
+    }
+
+    .card-field {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .card-field label {
+        min-width: auto;
+    }
+
+    .decrypt-form {
+        flex-direction: column;
+    }
+
+    .modal-content {
+        margin: 40px auto;
+        padding: 24px;
+    }
+
+    .filter-buttons {
+        flex-wrap: wrap;
+    }
+}
+</style>
+
+<div class="page-header">
+    <h2>Approved Testators</h2>
+    <p class="page-subtitle">Manage testator status and access encrypted wills</p>
+</div>
+
+<!-- Search and Filter Section -->
+<div class="search-filter-container">
+    <div class="search-filter-wrapper">
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" 
+                   id="searchInput" 
+                   class="search-input" 
+                   placeholder="Search by name..."
+                   onkeyup="filterCards()">
+        </div>
+
+        <div class="filter-group">
+            <span class="filter-label">Status:</span>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">
+                    All
+                </button>
+                <button class="filter-btn" data-filter="active" onclick="setFilter('active', this)">
+                    Active
+                </button>
+                <button class="filter-btn" data-filter="deceased" onclick="setFilter('deceased', this)">
+                    Deceased
+                </button>
+            </div>
+        </div>
+
+        <div class="results-count">
+            <span id="resultsCount">{{ a|length }}</span> testator(s)
+        </div>
+    </div>
+</div>
+
+<div class="cards-container" id="cardsContainer">
+    {% if a %}
+        {% for i in a %}
+        <div class="testator-card" data-name="{{ i.full_name|lower }}" data-status="{{ i.status|lower }}">
+            <div class="card-title">{{ i.full_name }}</div>
+
+            <div class="card-field">
+                <label>Email:</label>
+                <span class="card-field-value">{{ i.email }}</span>
+            </div>
+
+            <div class="card-field">
+                <label>Phone:</label>
+                <span class="card-field-value">{{ i.phone }}</span>
+            </div>
+
+            <div class="card-field">
+                <label>Place:</label>
+                <span class="card-field-value">{{ i.place }}</span>
+            </div>
+
+            <div class="card-field">
+                <label>Status:</label>
+                <span class="card-field-value">
+                    {% if i.status == "active" %}
+                        <select onchange="openModal('{{ i.id }}')" class="form-select form-select-sm">
+                            <option>active</option>
+                            <option value="deceased">Mark as Deceased</option>
+                        </select>
+                    {% else %}
+                        <span class="status-badge status-deceased">Deceased</span>
+                    {% endif %}
+                </span>
+            </div>
+
+            {% if i.status == "deceased" %}
+                <div class="card-field">
+                    <label>Death Certificate:</label>
+                    <span class="card-field-value">
+                        {% if i.death_certificate %}
+                            <a href="{{ i.death_certificate.url }}" target="_blank" class="link-view">📄 View Document</a>
+                        {% else %}
+                            <span style="color: rgba(255, 255, 255, 0.3);">Not available</span>
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="card-field">
+                    <label>Deceased Date:</label>
+                    <span class="card-field-value">
+                        {% if i.deceased_date %}
+                            {{ i.deceased_date }}
+                        {% else %}
+                            <span style="color: rgba(255, 255, 255, 0.3);">—</span>
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="key-section">
+                    <div class="card-field">
+                        <label>Encryption Key:</label>
+                        <span class="card-field-value">
+                            <button onclick="showKey('{{ i.id }}')" class="btn btn-primary btn-sm">
+                                🔑 Show Key
+                            </button>
+                        </span>
+                    </div>
+
+                    <div id="key_box_{{ i.id }}" class="key-box">
+                        <div class="key-display">
+                            <div class="key-value" id="key_value_{{ i.id }}">
+                                {% if i.will_document_set.first %}
+                                    {{ i.will_document_set.first.encryption_key }}
+                                {% else %}
+                                    No will document found
+                                {% endif %}
+                            </div>
+                            {% if i.will_document_set.first %}
+                                <button onclick="copyKey('{{ i.will_document_set.first.encryption_key }}')" class="btn btn-light btn-sm" title="Copy to clipboard">
+                                    📋
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="decrypt-section">
+                        <div class="card-field">
+                            <label>Decrypt Will:</label>
+                        </div>
+                        <form action="{% url 'decrypt_will' i.id %}" method="POST" class="decrypt-form">
+                            {% csrf_token %}
+                            <input type="text" name="key" placeholder="Enter encryption key" required class="form-control form-control-sm">
+                            <button type="submit" class="btn btn-success btn-sm">
+                                🔓 Decrypt
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state" style="grid-column: 1 / -1;">
+            <div class="empty-state-icon">📋</div>
+            <p>No approved testators found</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- No Results Message -->
+<div id="noResults" class="empty-state" style="display: none; grid-column: 1 / -1;">
+    <div class="empty-state-icon">🔍</div>
+    <p>No testators match your search criteria</p>
+</div>
+
+<!-- MODAL -->
+<div id="deathModal" class="modal-overlay">
+    <div class="modal-content">
+        <h4>Mark Testator as Deceased</h4>
+        <form id="deathForm" method="POST" action="{% url 'update_status' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="tid" id="testator_id">
+
+            <label>Deceased Date:</label>
+            <input type="date" name="deceased_date" required class="form-control">
+
+            <label>Upload Death Certificate:</label>
+            <input type="file" name="death_certificate" required class="form-control" accept=".pdf,.jpg,.jpeg,.png">
+
+            <div class="modal-actions">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="button" onclick="closeModal()" class="btn btn-secondary">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+let currentFilter = 'all';
+
+function setFilter(filter, button) {
+    // Update active button
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active', 'active-status', 'deceased-status');
+    });
+    
+    if (filter === 'active') {
+        button.classList.add('active-status');
+    } else if (filter === 'deceased') {
+        button.classList.add('deceased-status');
+    } else {
+        button.classList.add('active');
+    }
+    
+    currentFilter = filter;
+    filterCards();
+}
+
+function filterCards() {
+    const searchValue = document.getElementById('searchInput').value.toLowerCase();
+    const cards = document.querySelectorAll('.testator-card');
+    const noResults = document.getElementById('noResults');
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+        const name = card.getAttribute('data-name');
+        const status = card.getAttribute('data-status');
+        
+        // Check if card matches search
+        const matchesSearch = name.includes(searchValue);
+        
+        // Check if card matches filter
+        const matchesFilter = currentFilter === 'all' || status === currentFilter;
+        
+        // Show/hide card based on both conditions
+        if (matchesSearch && matchesFilter) {
+            card.classList.remove('hidden');
+            visibleCount++;
+        } else {
+            card.classList.add('hidden');
+        }
+    });
+
+    // Update results count
+    document.getElementById('resultsCount').textContent = visibleCount;
+
+    // Show/hide no results message
+    if (visibleCount === 0) {
+        noResults.style.display = 'block';
+    } else {
+        noResults.style.display = 'none';
+    }
+}
+
+function openModal(id) {
+    document.getElementById("testator_id").value = id;
+    document.getElementById("deathModal").style.display = "block";
+}
+
+function closeModal() {
+    document.getElementById("deathModal").style.display = "none";
+}
+
+function showKey(id) {
+    const keyBox = document.getElementById("key_box_" + id);
+    if (keyBox) {
+        keyBox.style.display = keyBox.style.display === "none" ? "block" : "none";
+    }
+}
+
+function copyKey(key) {
+    navigator.clipboard.writeText(key).then(function() {
+        alert("Encryption key copied to clipboard!");
+    }, function() {
+        alert("Failed to copy key. Please copy manually.");
+    });
+}
+
+// Close modal when clicking outside
+document.getElementById("deathModal").addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeModal();
+    }
+});
+</script>
+
+{% include "lawyer_footer.html" %}

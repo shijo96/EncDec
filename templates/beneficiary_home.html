@@ -1,0 +1,467 @@
+{% include "beneficiary_header.html" %}
+
+<!-- Notifications Section -->
+<section id="notifications" class="about section dark-section">
+  <div class="container" data-aos="fade-up" data-aos-delay="100">
+    
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <div class="content-wrapper text-center mb-5">
+          <div class="section-badge">Your Notifications</div>
+          <h2>New Will Notifications</h2>
+          <p class="lead">Review and access wills that have been designated to you</p>
+        </div>
+
+        {% if a %}
+          {% for notification in a %}
+          <div class="notification-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="notification-content">
+              <div class="notification-icon">
+                <i class="bi bi-file-earmark-text"></i>
+              </div>
+              <div class="notification-details">
+                <h4>{{ notification.message }}</h4>
+                <p class="notification-date">
+                  <i class="bi bi-calendar-event me-2"></i>
+                  <span>Date: {{ notification.date }}</span>
+                </p>
+              </div>
+            </div>
+
+            <!-- {% if c.death_certificate %}
+            <div class="document-section mb-4">
+              <div class="document-label">
+                <i class="bi bi-file-earmark-pdf me-2"></i>
+                <span>Death Certificate Available</span>
+              </div>
+              <a href="{{ c.death_certificate }}" class="btn-download" download>
+                <i class="bi bi-download me-2"></i>
+                <span>Download Certificate</span>
+              </a>
+            </div>
+            {% endif %} -->
+
+
+            {% if c.death_certificate %}
+            <div class="document-section mb-4">
+              <div class="document-label">
+                <i class="bi bi-file-earmark-pdf me-2"></i>
+                <span>Death Certificate Available</span>
+              </div>
+              <a href="{{ c.death_certificate.url }}" class="btn-download" target="_blank" rel="noopener noreferrer">
+                <i class="bi bi-download me-2"></i>
+                <span>Download Certificate</span>
+              </a>
+            </div>
+            {% endif %}
+
+            <div class="encryption-section mb-4">
+              <div class="key-label">
+                <i class="bi bi-key me-2"></i>
+                <span>Your Encryption Key</span>
+              </div>
+              
+              <div class="key-display" id="keyDisplay-{{ forloop.counter }}">
+                {{ b.encryption_key }}
+              </div>
+              
+              <button class="btn-copy" onclick="copyToClipboard('keyDisplay-{{ forloop.counter }}', this)">
+                <i class="bi bi-clipboard me-2"></i>
+                <span class="copy-text">Copy Key</span>
+              </button>
+            </div>
+
+            <div class="notification-action">
+              <form action="{% url 'decrypt_will' notification.WILL_DOCUMENT.TESTATOR.id %}" method="POST" class="decrypt-form">
+                {% csrf_token %}
+                <div class="input-group">
+                  <input type="text" name="key" class="form-control" placeholder="Enter decryption key" required>
+                  <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-unlock me-2"></i>
+                    <span>View Will</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+        <div class="empty-state" data-aos="fade-up" data-aos-delay="200">
+          <div class="empty-icon">
+            <i class="bi bi-inbox"></i>
+          </div>
+          <h3>No Notifications</h3>
+          <p>You don't have any will notifications at the moment.</p>
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<style>
+/* Dark Theme Base */
+body {
+  background-color: #0a0a0a;
+  color: #e0e0e0;
+}
+
+.dark-theme {
+  background-color: #0a0a0a;
+  color: #e0e0e0;
+}
+
+.dark-section {
+  background-color: #121212;
+  color: #e0e0e0;
+  padding: 4rem 0;
+}
+
+/* Notification Cards Styling */
+.notification-card {
+  background: linear-gradient(145deg, #1a1a1a 0%, #242424 100%);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.notification-card:hover {
+  box-shadow: 0 12px 32px rgba(102, 126, 234, 0.3), 0 0 1px rgba(102, 126, 234, 0.5) inset;
+  transform: translateY(-2px);
+  border-color: rgba(102, 126, 234, 0.3);
+}
+
+.notification-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.notification-icon {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+}
+
+.notification-details {
+  flex: 1;
+  text-align: left;
+}
+
+.notification-details h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.notification-date {
+  color: #a0a0a0;
+  font-size: 0.95rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* Document Section */
+.document-section {
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 12px;
+  padding: 1.25rem;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.document-label {
+  color: #a78bfa;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.btn-download {
+  display: inline-flex;
+  align-items: center;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-download:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.5);
+  color: white;
+}
+
+/* Encryption Section */
+.encryption-section {
+  background: rgba(168, 85, 247, 0.1);
+  border-radius: 12px;
+  padding: 1.25rem;
+  border: 1px solid rgba(168, 85, 247, 0.2);
+}
+
+.key-label {
+  color: #a78bfa;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.key-display {
+  background: #1a1a1a;
+  border: 2px solid rgba(168, 85, 247, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.95rem;
+  color: #a78bfa;
+  word-break: break-all;
+  margin-bottom: 1rem;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.btn-copy {
+  display: inline-flex;
+  align-items: center;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  border: none;
+  padding: 0.65rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.btn-copy:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(139, 92, 246, 0.5);
+}
+
+.btn-copy.copied {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+/* Notification Action */
+.notification-action {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.decrypt-form .input-group {
+  display: flex;
+  gap: 0.5rem;
+  max-width: 100%;
+}
+
+.decrypt-form .form-control {
+  background-color: #1a1a1a;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  flex: 1;
+}
+
+.decrypt-form .form-control::placeholder {
+  color: #666;
+}
+
+.decrypt-form .form-control:focus {
+  background-color: #242424;
+  border-color: #667eea;
+  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+  outline: none;
+  color: #ffffff;
+}
+
+.decrypt-form .btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 2rem;
+  font-weight: 600;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  cursor: pointer;
+}
+
+.decrypt-form .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.5);
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: linear-gradient(145deg, #1a1a1a 0%, #242424 100%);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.empty-icon {
+  font-size: 4rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  color: #a0a0a0;
+  font-size: 1rem;
+}
+
+/* Content Wrapper */
+.content-wrapper {
+  text-align: center;
+}
+
+.section-badge {
+  display: inline-block;
+  padding: 0.5rem 1.25rem;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+  color: #a78bfa;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(102, 126, 234, 0.3);
+}
+
+.content-wrapper h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #ffffff 0%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.content-wrapper .lead {
+  font-size: 1.125rem;
+  color: #a0a0a0;
+  margin-bottom: 2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .notification-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .notification-details {
+    text-align: center;
+  }
+  
+  .notification-date {
+    justify-content: center;
+  }
+  
+  .decrypt-form .input-group {
+    flex-direction: column;
+  }
+  
+  .decrypt-form .btn-primary {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .content-wrapper h2 {
+    font-size: 2rem;
+  }
+
+  .btn-download,
+  .btn-copy {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 576px) {
+  .notification-card {
+    padding: 1.5rem;
+  }
+
+  .notification-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+
+  .content-wrapper h2 {
+    font-size: 1.75rem;
+  }
+}
+</style>
+
+<script>
+function copyToClipboard(elementId, button) {
+  const keyElement = document.getElementById(elementId);
+  const textToCopy = keyElement.textContent.trim();
+  
+  // Copy to clipboard
+  navigator.clipboard.writeText(textToCopy).then(function() {
+    // Success feedback
+    const copyText = button.querySelector('.copy-text');
+    const originalText = copyText.textContent;
+    
+    button.classList.add('copied');
+    copyText.textContent = 'Copied!';
+    
+    // Reset after 2 seconds
+    setTimeout(function() {
+      button.classList.remove('copied');
+      copyText.textContent = originalText;
+    }, 2000);
+  }).catch(function(err) {
+    console.error('Failed to copy text: ', err);
+    alert('Failed to copy to clipboard. Please copy manually.');
+  });
+}
+</script>
+
+{% include "beneficiary_footer.html" %}

@@ -1,0 +1,631 @@
+{% include "testator_header.html" %}
+
+<style>
+    body {
+        background: #0d0d0d;
+        color: #e6e6e6;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    .page-container {
+        max-width: 900px;
+        margin: 80px auto 120px;
+        padding: 0 20px;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .page-header h2 {
+        color: #00eaff;
+        font-size: 32px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        letter-spacing: 0.5px;
+    }
+
+    .page-subtitle {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 14px;
+    }
+
+    /* Messages */
+    .messages-container {
+        margin-bottom: 30px;
+    }
+
+    .message {
+        padding: 14px 20px;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .message.success {
+        background-color: rgba(26, 127, 55, 0.15);
+        border-left: 4px solid #28a745;
+        color: #4caf50;
+    }
+
+    .message.error {
+        background-color: rgba(176, 42, 55, 0.15);
+        border-left: 4px solid #dc3545;
+        color: #ff5252;
+    }
+
+    .message.info {
+        background-color: rgba(0, 153, 204, 0.15);
+        border-left: 4px solid #0099cc;
+        color: #00bfff;
+    }
+
+    .message::before {
+        content: '●';
+        font-size: 18px;
+    }
+
+    /* Form Card */
+    .form-card {
+        background: linear-gradient(145deg, #1a1a1a, #151515);
+        border: 1px solid #2a2a2a;
+        border-radius: 16px;
+        padding: 40px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .form-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #00eaff, #0099cc);
+    }
+
+    /* Form Groups */
+    .form-group {
+        margin-bottom: 24px;
+    }
+
+    .form-group label {
+        display: block;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-group label .required {
+        color: #ff5252;
+        margin-left: 4px;
+    }
+
+    /* Input Fields */
+   .form-control {
+    width: 100%;
+    background: #0f0f0f;
+    border: 1px solid #333;
+    color: #eee !important; /* Added !important to ensure it applies */
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+  .form-control:focus {
+    outline: none;
+    border-color: #00eaff;
+    box-shadow: 0 0 0 3px rgba(0, 234, 255, 0.1);
+    background: #121212;
+    color: #eee !important; /* Ensure text stays visible while typing */
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+
+
+    /* Additional fix for specific input types */
+input.form-control,
+textarea.form-control {
+    color: #eee !important;
+    -webkit-text-fill-color: #eee; /* For webkit browsers like Chrome/Safari */
+}
+
+/* Fix for autofill */
+input.form-control:-webkit-autofill,
+input.form-control:-webkit-autofill:hover,
+input.form-control:-webkit-autofill:focus {
+    -webkit-text-fill-color: #eee !important;
+    -webkit-box-shadow: 0 0 0px 1000px #0f0f0f inset;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+
+
+
+    /*
+     File Input */
+    .file-input-wrapper {
+        position: relative;
+        background: #0f0f0f;
+        border: 2px dashed #333;
+        border-radius: 8px;
+        padding: 24px;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .file-input-wrapper:hover {
+        border-color: #00eaff;
+        background: #121212;
+    }
+
+    .file-input-wrapper.has-file {
+        border-style: solid;
+        border-color: #00eaff;
+        background: rgba(0, 234, 255, 0.05);
+    }
+
+    .file-input-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+    }
+
+    .file-icon {
+        font-size: 32px;
+        color: #00eaff;
+    }
+
+    .file-text {
+        color: rgb(255, 255, 255);
+        font-size: 14px;
+    }
+
+    .file-subtext {
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 12px;
+        margin-top: 4px;
+    }
+
+    .file-name-display {
+        margin-top: 12px;
+        color: #00eaff;
+        font-size: 13px;
+        font-weight: 500;
+        display: none;
+    }
+
+    input[type="file"] {
+        display: none;
+    }
+
+    /* Credentials Section */
+    .credentials-section {
+        background: rgba(0, 234, 255, 0.05);
+        border: 1px solid rgba(0, 234, 255, 0.2);
+        border-radius: 12px;
+        padding: 24px;
+        margin: 32px 0;
+    }
+
+    .credentials-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(0, 234, 255, 0.2);
+    }
+
+    .credentials-header h3 {
+        color: #00eaff;
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .credentials-icon {
+        font-size: 20px;
+    }
+
+    .credentials-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    /* Beneficiaries Section */
+    .beneficiaries-section {
+        margin-top: 32px;
+    }
+
+    .beneficiaries-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #2a2a2a;
+    }
+
+    .beneficiaries-header h3 {
+        color: #fff;
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .beneficiary-item {
+        background: #0f0f0f;
+        border: 1px solid #2a2a2a;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 16px;
+        position: relative;
+        transition: all 0.2s ease;
+    }
+
+    .beneficiary-item:hover {
+        border-color: #333;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .beneficiary-number {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        background: rgba(0, 234, 255, 0.2);
+        color: #00eaff;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .beneficiary-fields {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .beneficiary-fields.full-width {
+        grid-template-columns: 1fr;
+    }
+
+    .remove-beneficiary {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        background: rgba(176, 42, 55, 0.2);
+        border: 1px solid #b02a37;
+        border-radius: 6px;
+        color: #ff5252;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .remove-beneficiary:hover {
+        background: rgba(176, 42, 55, 0.3);
+        border-color: #dc3545;
+    }
+
+    .add-beneficiary {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #009966, #00cc88);
+        border: none;
+        border-radius: 8px;
+        color: #fff;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .add-beneficiary:hover {
+        background: linear-gradient(135deg, #00cc88, #00e699);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 153, 102, 0.4);
+    }
+
+    /* Submit Button */
+    .submit-section {
+        margin-top: 32px;
+        text-align: center;
+    }
+
+    .btn-submit {
+        padding: 14px 48px;
+        background: linear-gradient(135deg, #0099cc, #00bfff);
+        border: none;
+        border-radius: 8px;
+        color: #fff;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .btn-submit:hover {
+        background: linear-gradient(135deg, #00bfff, #00d4ff);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 153, 204, 0.4);
+    }
+
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+
+    /* Info Box */
+    .info-box {
+        background: rgba(255, 193, 7, 0.1);
+        border: 1px solid rgba(255, 193, 7, 0.3);
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 24px;
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .info-icon {
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+
+    .info-text {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .page-container {
+            margin: 40px auto 80px;
+        }
+
+        .form-card {
+            padding: 24px;
+        }
+
+        .page-header h2 {
+            font-size: 24px;
+        }
+
+        .credentials-grid,
+        .beneficiary-fields {
+            grid-template-columns: 1fr;
+        }
+
+        .beneficiary-number {
+            top: 12px;
+            right: 12px;
+            width: 28px;
+            height: 28px;
+            font-size: 12px;
+        }
+    }
+</style>
+
+<div class="page-container">
+    <div class="page-header">
+        <h2>📜 Upload Your Will</h2>
+        <p class="page-subtitle">Securely store your will with encryption</p>
+    </div>
+
+    {% if messages %}
+        <div class="messages-container">
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="form-card">
+        <div class="info-box">
+            <span class="info-icon">💡</span>
+            <div class="info-text">
+                Your will document will be encrypted with a secure key. Please provide beneficiary details who will have access to this document after verification.
+            </div>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- File Upload -->
+            <div class="form-group">
+                <label>Will Document <span class="required">*</span></label>
+                <div class="file-input-wrapper" id="fileWrapper">
+                    <label for="fileInput" class="file-input-label">
+                        <div class="file-icon">📄</div>
+                        <div class="file-text">Click to upload your will document</div>
+                        <div class="file-subtext">PDF, DOC, DOCX (Max 10MB)</div>
+                    </label>
+                    <input type="file" name="file" id="fileInput" required onchange="handleFileSelect(this)">
+                    <div class="file-name-display" id="fileNameDisplay"></div>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="form-group">
+                <label>Description <span class="required">*</span></label>
+                <textarea name="desc" class="form-control" placeholder="Brief description of your will..." required></textarea>
+            </div>
+
+            <!-- Credentials Section -->
+            <div class="credentials-section">
+                <div class="credentials-header">
+                    <span class="credentials-icon">🔐</span>
+                    <h3>Encryption Credentials</h3>
+                </div>
+                <div class="credentials-grid">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Username <span class="required">*</span></label>
+                        <input type="text" name="username" class="form-control" placeholder="Enter username" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Password <span class="required">*</span></label>
+                        <input type="password" name="password" class="form-control" placeholder="Enter password" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Beneficiaries Section -->
+            <div class="beneficiaries-section">
+                <div class="beneficiaries-header">
+                    <h3>👥 Beneficiaries</h3>
+                    <button type="button" class="add-beneficiary" onclick="addBeneficiary()">
+                        ➕ Add Beneficiary
+                    </button>
+                </div>
+
+                <div id="beneficiariesContainer">
+                    <!-- Beneficiary items will be added here -->
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="submit-section">
+                <button type="submit" class="btn-submit">
+                    <span>🔒</span>
+                    <span>Upload & Encrypt Will</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+let beneficiaryCount = 0;
+
+function handleFileSelect(input) {
+    const wrapper = document.getElementById('fileWrapper');
+    const display = document.getElementById('fileNameDisplay');
+    
+    if (input.files && input.files[0]) {
+        const fileName = input.files[0].name;
+        const fileSize = (input.files[0].size / 1024 / 1024).toFixed(2);
+        
+        wrapper.classList.add('has-file');
+        display.textContent = `📎 ${fileName} (${fileSize} MB)`;
+        display.style.display = 'block';
+    } else {
+        wrapper.classList.remove('has-file');
+        display.style.display = 'none';
+    }
+}
+
+function addBeneficiary() {
+    beneficiaryCount++;
+    const container = document.getElementById('beneficiariesContainer');
+    
+    const beneficiaryHTML = `
+        <div class="beneficiary-item" id="beneficiary_${beneficiaryCount}">
+            <div class="beneficiary-number">${beneficiaryCount}</div>
+            
+            <div class="beneficiary-fields">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Name <span class="required">*</span></label>
+                    <input type="text" name="b_name[]" class="form-control" placeholder="Beneficiary name" required>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Email <span class="required">*</span></label>
+                    <input type="email" name="b_email[]" class="form-control" placeholder="email@example.com" required>
+                </div>
+            </div>
+            <div class="beneficiary-fields full-width">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Place</label>
+                    <input type="text" name="b_place[]" class="form-control" placeholder="e.g., Thrissur, Palakkad ">
+                </div>
+            </div>
+            
+            
+            
+            <button type="button" class="remove-beneficiary" onclick="removeBeneficiary(${beneficiaryCount})">
+                ✕ Remove
+            </button>
+        </div>
+    `;
+    
+    container.insertAdjacentHTML('beforeend', beneficiaryHTML);
+}
+
+function removeBeneficiary(id) {
+    const element = document.getElementById(`beneficiary_${id}`);
+    if (element) {
+        element.remove();
+        updateBeneficiaryNumbers();
+    }
+}
+
+function updateBeneficiaryNumbers() {
+    const beneficiaries = document.querySelectorAll('.beneficiary-item');
+    beneficiaries.forEach((item, index) => {
+        const numberBadge = item.querySelector('.beneficiary-number');
+        if (numberBadge) {
+            numberBadge.textContent = index + 1;
+        }
+    });
+}
+
+// Add one beneficiary by default on page load
+window.addEventListener('DOMContentLoaded', function() {
+    addBeneficiary();
+});
+</script>
+
+{% include "testator_footer.html" %}

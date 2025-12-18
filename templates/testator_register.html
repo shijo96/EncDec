@@ -1,0 +1,304 @@
+{% include "public_header.html" %}
+
+<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #020c19;
+            color: #e0e0e0;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .registration-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .registration-card {
+            background: linear-gradient(145deg, #0a1929, #051220);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .registration-header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .registration-header h2 {
+            color: #4a9eff;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .registration-header p {
+            color: #8a8a8a;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #b0b0b0;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .form-group label span {
+            color: #ff4757;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            background-color: #0d1b2a;
+            border: 1px solid #1e3a5f;
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #4a9eff;
+            box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.1);
+            background-color: #0f1f2e;
+        }
+
+        .form-input::placeholder {
+            color: #4a5568;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 16px;
+            background-color: #0d1b2a;
+            border: 2px dashed #1e3a5f;
+            border-radius: 8px;
+            color: #8a8a8a;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-input-label:hover {
+            border-color: #4a9eff;
+            background-color: #0f1f2e;
+        }
+
+        .file-input-label svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #4a9eff, #357abd);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #357abd, #2868a8);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 158, 255, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .messages {
+            margin-bottom: 20px;
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .message.success {
+            background-color: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #4ade80;
+        }
+
+        .message.error {
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
+        }
+
+        .message.info {
+            background-color: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+        }
+
+        @media (max-width: 640px) {
+            .registration-card {
+                padding: 30px 20px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .registration-header h2 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="registration-container">
+        <div class="registration-card">
+            <div class="registration-header">
+                <h2>Testator Registration</h2>
+                <p>Please fill in your details to create an account</p>
+            </div>
+
+            <div class="messages">
+              {% if messages %}
+    {% for message in messages %}
+    <p style="color: {% if message.tags == 'error' %}red{% else %}green{% endif %};">
+        {{ message }}
+    </p>
+    {% endfor %}
+    {% endif %}
+            </div>
+
+            <form method="POST" enctype="multipart/form-data">
+                <!-- CSRF token would go here -->
+                
+                <div class="form-group">
+                    <label for="fullname">Full Name <span>*</span></label>
+                    <input type="text" id="fullname" name="fullname" class="form-input" placeholder="Enter your full name" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email">Email <span>*</span></label>
+                        <input type="email" id="email" name="email" class="form-input" placeholder="your@email.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone <span>*</span></label>
+                        <input type="tel" id="phone" name="phone" class="form-input" placeholder="+1 234 567 8900" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="place">Place <span>*</span></label>
+                    <input type="text" id="place" name="place" class="form-input" placeholder="City, State" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Address <span>*</span></label>
+                    <input type="text" id="address" name="address" class="form-input" placeholder="Street address" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="idproof">ID Proof <span>*</span></label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="idproof" name="idproof" accept=".pdf,.jpg,.jpeg,.png" required>
+                        <label for="idproof" class="file-input-label">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                            Choose File (PDF, JPG, PNG)
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="username">Username <span>*</span></label>
+                        <input type="text" id="username" name="username" class="form-input" placeholder="Choose a username" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password <span>*</span></label>
+                        <input type="password" id="password" name="password" class="form-input" placeholder="••••••••" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">Create Account</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // File input display name
+        const fileInput = document.getElementById('idproof');
+        const fileLabel = document.querySelector('.file-input-label');
+        const originalText = fileLabel.innerHTML;
+
+        fileInput.addEventListener('change', function(e) {
+            if (this.files && this.files.length > 0) {
+                const fileName = this.files[0].name;
+                fileLabel.innerHTML = `
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 20px; height: 20px; margin-right: 8px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    ${fileName}
+                `;
+                fileLabel.style.borderColor = '#4a9eff';
+                fileLabel.style.color = '#4a9eff';
+            } else {
+                fileLabel.innerHTML = originalText;
+                fileLabel.style.borderColor = '#1e3a5f';
+                fileLabel.style.color = '#8a8a8a';
+            }
+        });
+    </script>
+</body>
+</html>

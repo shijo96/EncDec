@@ -1,0 +1,343 @@
+{% include "lawyer_header.html" %}
+
+<style>
+    body {
+        background-color: #121111;
+        color: #e6e6e6;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    .container {
+        max-width: 1400px;
+        margin: 80px auto 150px;
+        padding: 0 20px;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    }
+
+    h4 {
+        color: #fff;
+        font-size: 32px;
+        margin-bottom: 8px;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+    }
+
+    .page-subtitle {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 14px;
+        margin-top: 8px;
+    }
+
+    /* Messages */
+    .messages-container {
+        max-width: 800px;
+        margin: 0 auto 30px;
+    }
+
+    .message {
+        padding: 12px 20px;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .message-success {
+        background-color: rgba(26, 127, 55, 0.15);
+        border-left: 4px solid #28a745;
+        color: #4caf50;
+    }
+
+    .message-error {
+        background-color: rgba(176, 42, 55, 0.15);
+        border-left: 4px solid #dc3545;
+        color: #ff5252;
+    }
+
+    .message::before {
+        content: '●';
+        font-size: 20px;
+    }
+
+    /* Table Container */
+    .table-container {
+        overflow-x: auto;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        background: transparent;
+        color: #fff;
+        font-size: 14px;
+    }
+
+    th, td {
+        padding: 16px 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        text-align: left;
+    }
+
+    th {
+        background: rgba(255, 255, 255, 0.08);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 0.5px;
+        color: rgba(255, 255, 255, 0.9);
+        white-space: nowrap;
+    }
+
+    td {
+        color: rgba(255, 255, 255, 0.85);
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+    tbody tr {
+        transition: background-color 0.2s ease;
+    }
+
+    tbody tr:hover {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Status Badges */
+    .status-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: capitalize;
+    }
+
+    .status-active {
+        background-color: rgba(26, 127, 55, 0.2);
+        color: #4caf50;
+    }
+
+    .status-pending {
+        background-color: rgba(255, 193, 7, 0.2);
+        color: #ffc107;
+    }
+
+    .status-rejected {
+        background-color: rgba(176, 42, 55, 0.2);
+        color: #ff5252;
+    }
+
+    /* Links */
+    a.view-link {
+        color: #4ec9ff;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s ease;
+    }
+
+    a.view-link:hover {
+        color: #6dd5ff;
+        text-decoration: underline;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        border-radius: 6px;
+        color: #fff !important;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 13px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .approve {
+        background-color: #1a7f37;
+    }
+
+    .approve:hover {
+        background-color: #28a745;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(26, 127, 55, 0.3);
+    }
+
+    .reject {
+        background-color: #b02a37;
+    }
+
+    .reject:hover {
+        background-color: #dc3545;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(176, 42, 55, 0.3);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .empty-state-icon {
+        font-size: 48px;
+        margin-bottom: 16px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+        table {
+            font-size: 13px;
+        }
+        
+        th, td {
+            padding: 12px 8px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            margin: 40px auto 80px;
+        }
+
+        h4 {
+            font-size: 24px;
+        }
+
+        .table-container {
+            padding: 12px;
+        }
+
+        table {
+            font-size: 12px;
+        }
+
+        th, td {
+            padding: 10px 6px;
+        }
+
+        .btn {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="container">
+    <div class="page-header">
+        <h4>Verify Registered Testators</h4>
+        <p class="page-subtitle">Review and approve testator registration requests</p>
+    </div>
+
+    {% if messages %}
+        <div class="messages-container">
+            {% for message in messages %}
+                <div class="message {% if message.tags == 'error' %}message-error{% else %}message-success{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="table-container">
+        {% if a %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sl.No</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Place</th>
+                        <th>Address</th>
+                        <th>ID Proof</th>
+                        <th>Status</th>
+                        <th>Approval</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in a %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td><strong>{{ i.full_name }}</strong></td>
+                        <td>{{ i.email }}</td>
+                        <td>{{ i.phone }}</td>
+                        <td>{{ i.place }}</td>
+                        <td>{{ i.address }}</td>
+                        <td>
+                            <a href="{{ i.id_proof.url }}" target="_blank" class="view-link">
+                                📄 View Document
+                            </a>
+                        </td>
+                        <td>
+                            <span class="status-badge status-{{ i.status|lower }}">
+                                {{ i.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status-badge status-{{ i.approval_status|lower }}">
+                                {{ i.approval_status }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if i.approval_status == 'pending' %}
+                                <div class="action-buttons">
+                                    <a href="/lawyer_approve_testator/{{ i.id }}" 
+                                       class="btn approve"
+                                       onclick="return confirm('Are you sure you want to approve this testator?')">
+                                        ✓ Approve
+                                    </a>
+                                    <a href="/lawyer_reject_testator/{{ i.id }}" 
+                                       class="btn reject"
+                                       onclick="return confirm('Are you sure you want to reject this testator?')">
+                                        ✕ Reject
+                                    </a>
+                                </div>
+                            {% else %}
+                                <span style="color: rgba(255, 255, 255, 0.4); font-size: 12px;">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">📋</div>
+                <p>No testator verification requests found</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% include "lawyer_footer.html" %}
